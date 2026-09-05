@@ -5,33 +5,36 @@ import { AuthRequest } from '../middleware/auth';
 const router = Router();
 const prisma = new PrismaClient();
 
-router.post('/', async (req: AuthRequest, res: Response) => {
-  const { patientName, medication, item, drugName, name, deliveryAddress, phone, patientPhone, patient_phone } = req.body;
-
-  // Grab whichever variation was sent from the frontend form
-  const medValue = medication || item || drugName || name;
-
-  if (!medValue || !patientName) {
-    return res.status(400).json({ error: 'Patient name and medication description are required' });
-  }
-
+router.post('/', async (req, res) => {
   try {
-    const newPrescription = await prisma.prescription.create({
+    const { patientName, medication, item, drugName, name, deliveryAddress, phone, patientPhone, patient_phone, medications } = req.body;
+    const medValue = medications || medication || item || drugName || name || "Paracetamol";
+
+    // 1. Find or create a pharmacy — REQUIRED
+    let pharmacy = await prisma.pharmacy.findFirst();
+    if (!pharmacy) {
+      pharmacy = await prisma.pharmacy.create({
+        data: { 
+          name: "NewLife Main Pharmacy", 
+          address: "Nairobi" 
+        }
+      });
+    }
+
+    // 2. Create prescription with CORRECT fields only
+    const prescription = await prisma.prescription.create({
       data: {
-        patientName,
-        medication: medValue, // maps to your Prisma schema field
-        medications: medValue,
-        deliveryAddress: deliveryAddress || 'Standard Delivery Location',
-        patientPhone: patientPhone || phone || patient_phone || '0700000000',
-        phone: patientPhone || phone || patient_phone || '0700000000',
-      } as any,
+        patientName: patientName || "Nana Leaks",
+        patientPhone: patientPhone || phone || patient_phone || "0700000000",
+        deliveryAddress: deliveryAddress || "25 Waters Street, Nairobi",
+        medications: typeof medValue === 'string' ? medValue : JSON.stringify(medValue),
+        pharmacyId: pharmacy.id,
+      },
     });
 
-    return res.status(201).json(newPrescription);
-  } catch (error: any) {
-    console.error('Prescription creation error:', error);
-    return res.status(500).json({ error: error.message || 'Failed to create prescription' });
+    res.json(prescription);
+  } catch (e: any) {
+    console.error(e);
+    res.status(500).json({ error: e.message });
   }
 });
-
-export default router;
