@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRouter from './routes/auth';
 import prescriptionsRouter from './routes/prescriptions';
 import ordersRouter from './routes/orders';
+import { Order } from './models/order'; // Assuming you have an Order model defined 
 
 dotenv.config();
 
