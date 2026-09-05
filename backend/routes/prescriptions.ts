@@ -20,6 +20,7 @@ router.post('/', async (req: AuthRequest, res: Response) => {
       data: {
         patientName,
         medication: medValue, // maps to your Prisma schema field
+        medications: medValue,
         deliveryAddress: deliveryAddress || 'Standard Delivery Location',
         patientPhone: patientPhone || phone || patient_phone || '0700000000',
         phone: patientPhone || phone || patient_phone || '0700000000',
