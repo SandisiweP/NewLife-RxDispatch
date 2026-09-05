@@ -72,7 +72,7 @@ router.patch('/:id/assign', async (req: AuthRequest, res: Response) => {
     });
 
     const updatedOrder = await prisma.order.update({
-      where: { id },
+      where: { id: req.params.id as string },
       data: {
         riderId: rider.id,
         status: 'ASSIGNED',
@@ -112,7 +112,7 @@ router.patch('/:id/status', async (req: AuthRequest, res: Response) => {
 
   try {
     const updatedOrder = await prisma.order.update({
-      where: { id },
+      where: { id: req.params.id as string },
       data: { 
         status: dbStatus as any 
       },
