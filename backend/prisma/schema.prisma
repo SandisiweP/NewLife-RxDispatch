@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PHARMACY_STAFF
+  DISPATCHER
+  RIDER
+}
+
+model Pharmacy {
+  id            String         @id @default(uuid())
+  name          String
+  address       String
+  users         User[]
+  prescriptions Prescription[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model User {
+  id               String      @id @default(uuid())
+  email            String      @unique
+  passwordHash     String
+  name             String
+  role             Role        @default(PHARMACY_STAFF)
+  pharmacyId       String?
+  pharmacy         Pharmacy?   @relation(fields: [pharmacyId], references: [id])
+  dispatcherOrders Order[]     @relation("DispatcherOrders")
+  riderOrders      Order[]     @relation("RiderOrders")
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+enum PrescriptionStatus {
+  PENDING
+  VERIFIED
+  PROCESSING
+  READY_FOR_DISPATCH
+  CANCELLED
+}
+
+enum OrderStatus {
+  UNASSIGNED
+  ASSIGNED
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+model Prescription {
+  id              String             @id @default(uuid())
+  patientName     String
+  patientPhone    String
+  deliveryAddress String
+  medications     String             // JSON string or comma-separated items
+  status          PrescriptionStatus @default(PENDING)
+  pharmacyId      String
+  pharmacy        Pharmacy           @relation(fields: [pharmacyId], references: [id])
+  orders          Order[]
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+}
+
+model Order {
+  id             String       @id @default(uuid())
+  prescriptionId String
+  prescription   Prescription @relation(fields: [prescriptionId], references: [id])
+  dispatcherId   String?
+  dispatcher     User?        @relation("DispatcherOrders", fields: [dispatcherId], references: [id])
+  riderId        String?
+  rider          User?        @relation("RiderOrders", fields: [riderId], references: [id])
+  status         OrderStatus  @default(UNASSIGNED)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
