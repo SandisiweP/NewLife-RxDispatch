@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-const API_URL="https://newlife-rxdispatch.onrender.com/api"
+const API_URL = "https://newlife-rxdispatch.onrender.com/api";
 
 interface Order {
   id: string;
@@ -47,7 +47,7 @@ export default function App() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('${API_URL}/api/orders');
+      const res = await fetch(`${API_URL}/orders`);
       if (res.ok) {
         const data = await res.json();
         setOrders(data);
@@ -60,7 +60,7 @@ export default function App() {
   const handleCreatePrescription = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const presRes = await fetch(`${API_URL}/api/prescriptions`, {
+      const presRes = await fetch(`${API_URL}/prescriptions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -77,7 +77,7 @@ export default function App() {
 
       if (presRes.ok) {
         const presData = await presRes.json();
-        const orderRes = await fetch('${AP_URL}/api/orders', {
+        const orderRes = await fetch(`${API_URL}/orders`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prescriptionId: presData.id }),
@@ -114,14 +114,14 @@ export default function App() {
     );
 
     try {
-      const assignRes = await fetch(`${API_URL}/api/orders/${orderId}/assign`, {
+      const assignRes = await fetch(`${API_URL}/orders/${orderId}/assign`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ riderName }),
       });
 
       if (assignRes.ok) {
-        await fetch(`${API_URL}/api/orders/${orderId}/status`, {
+        await fetch(`${API_URL}/orders/${orderId}/status`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'ASSIGNED' }),
@@ -134,9 +134,7 @@ export default function App() {
     }
   };
 
-  // Step 1 Updated handler: Optimistic status state transition
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
-    // 1. Instantly update React state so UI unlocks the next button immediately
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
         order.id === orderId ? { ...order, status: newStatus } : order
@@ -152,9 +150,8 @@ export default function App() {
 
     showToast(`Order #${orderId.substring(0, 8)} ${statusLabels[newStatus] || newStatus}`, 'success');
 
-    // 2. Send update to API in background
     try {
-      await fetch(`${API_URL}/api/orders/${orderId}/status`, {
+      await fetch(`${API_URL}/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -395,7 +392,6 @@ export default function App() {
                   const status = getDisplayStatus(o);
                   const isDelivered = status === 'DELIVERED';
 
-                  // Strict sequential step rules
                   const canAccept = status === 'ASSIGNED' || status === 'CREATED' || status === 'UNASSIGNED';
                   const canPickup = status === 'ACCEPTED';
                   const canTransit = status === 'PICKED_UP';
