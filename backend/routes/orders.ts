@@ -132,8 +132,9 @@ router.patch('/:id/status', async (req: AuthRequest, res: Response) => {
 });
 
 export default router;
+
 // Temporary route to clean up stuck orders
-router.delete('/cleanup/faulty', async (req: AuthRequest, res: Response) => {
+router.get('/cleanup/faulty', async (req: AuthRequest, res: Response) => {
   try {
     const result = await prisma.order.deleteMany({
       where: { 
