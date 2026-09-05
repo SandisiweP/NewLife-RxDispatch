@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-const API_URL="https://newlife-rxdispatch.onrender.com"
+const API_URL="https://newlife-rxdispatch.onrender.com/api"
 
 interface Order {
   id: string;
