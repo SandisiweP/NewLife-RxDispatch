@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+const API_URL="https://newlife-rxdispatch.onrender.com"
 
 interface Order {
   id: string;
@@ -46,7 +47,7 @@ export default function App() {
 
   const fetchOrders = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/orders');
+      const res = await fetch('${API_URL}/api/orders');
       if (res.ok) {
         const data = await res.json();
         setOrders(data);
@@ -59,7 +60,7 @@ export default function App() {
   const handleCreatePrescription = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const presRes = await fetch('http://localhost:5000/api/prescriptions', {
+      const presRes = await fetch(`${API_URL}/api/prescriptions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -67,13 +68,16 @@ export default function App() {
           patientPhone,
           deliveryAddress,
           medications,
+          medication: medications,
+          medicalDescription: medications,
+          description: medications,
           pharmacyId: '00000000-0000-0000-0000-000000000001',
         }),
       });
 
       if (presRes.ok) {
         const presData = await presRes.json();
-        const orderRes = await fetch('http://localhost:5000/api/orders', {
+        const orderRes = await fetch('${AP_URL}/api/orders', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prescriptionId: presData.id }),
@@ -110,14 +114,14 @@ export default function App() {
     );
 
     try {
-      const assignRes = await fetch(`http://localhost:5000/api/orders/${orderId}/assign`, {
+      const assignRes = await fetch(`${API_URL}/api/orders/${orderId}/assign`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ riderName }),
       });
 
       if (assignRes.ok) {
-        await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+        await fetch(`${API_URL}/api/orders/${orderId}/status`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'ASSIGNED' }),
@@ -150,7 +154,7 @@ export default function App() {
 
     // 2. Send update to API in background
     try {
-      await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+      await fetch(`${API_URL}/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
