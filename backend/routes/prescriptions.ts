@@ -6,7 +6,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 router.post('/', async (req: AuthRequest, res: Response) => {
-  const { patientName, medication, item, drugName, name, deliveryAddress, patientPhone, patient_phone } = req.body;
+  const { patientName, medication, item, drugName, name, deliveryAddress, phone, patientPhone, patient_phone } = req.body;
 
   // Grab whichever variation was sent from the frontend form
   const medValue = medication || item || drugName || name;
