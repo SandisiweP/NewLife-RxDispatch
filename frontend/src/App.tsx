@@ -103,6 +103,7 @@ export default function App() {
 
   const handleAssignRider = async (orderId: string, riderName: string) => {
     if (!riderName) return;
+    const riderId = riderName.toLowerCase().replace(/\s+/g, '_');
 
     // Optimistically update assigned rider locally
     setOrders((prev) =>
@@ -117,17 +118,12 @@ export default function App() {
       const assignRes = await fetch(`${API_URL}/orders/${orderId}/assign`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ riderName }),
+        body: JSON.stringify({ riderId, riderName }),
       });
 
       if (assignRes.ok) {
-        await fetch(`${API_URL}/orders/${orderId}/status`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: 'ASSIGNED' }),
-        });
-
         showToast(`Order #${orderId.substring(0, 8)} assigned to ${riderName}`, 'info');
+        fetchOrders();
       }
     } catch (err) {
       console.error('Rider assignment error:', err);
@@ -156,6 +152,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
       });
+      fetchOrders();
     } catch (err) {
       console.error('Status update network error:', err);
     }
