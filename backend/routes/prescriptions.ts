@@ -6,7 +6,7 @@ const router = Router();
 const prisma = new PrismaClient();
 
 router.post('/', async (req: AuthRequest, res: Response) => {
-  const { patientName, medication, item, drugName, name, deliveryAddress, phone } = req.body;
+  const { patientName, medication, item, drugName, name, deliveryAddress, patientPhone, patient_phone } = req.body;
 
   // Grab whichever variation was sent from the frontend form
   const medValue = medication || item || drugName || name;
@@ -21,7 +21,8 @@ router.post('/', async (req: AuthRequest, res: Response) => {
         patientName,
         medication: medValue, // maps to your Prisma schema field
         deliveryAddress: deliveryAddress || 'Standard Delivery Location',
-        phone: phone || '0700000000',
+        patientPhone: patientPhone || phone || patient_phone || '0700000000',
+        phone: patientPhone || phone || patient_phone || '0700000000',
       } as any,
     });
 
