@@ -52,10 +52,15 @@ router.get('/', async (req: AuthRequest, res: Response) => {
 // Assign rider route
 router.patch('/:id/assign', async (req: AuthRequest, res: Response) => {
   const { id } = req.params;
-  const { riderId, riderName } = req.body;
+  let { riderId, riderName } = req.body;
+
+  // Fallback if frontend only sends riderName
+  if (!riderId && riderName) {
+    riderId = riderName.toLowerCase().replace(/\s+/g, '_');
+  }
 
   if (!riderId) {
-    return res.status(400).json({ error: 'riderId is required for assignment' });
+    return res.status(400).json({ error: 'riderId or riderName is required for assignment' });
   }
 
   try {
