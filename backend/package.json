@@ -2,11 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "dev": "nodemon --exec tsx server.ts",
-    "build": "build": "tsc server.ts --outDir dist --module commonjs --target es2022 --esModuleInterop",
-    "start": "node dist/server.js"
-  },
+ "scripts": {
+  "dev": "nodemon --exec tsx server.ts",
+  "build": "tsc server.ts --outDir dist --module commonjs --target es2022 --esModuleInterop",
+  "start": "node dist/server.js"
+}
   "keywords": [],
   "author": "",
   "license": "ISC",
